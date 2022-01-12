@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['success' => false,'error' => $validator->messages()->first()], 200);
         }
 
         //Request is valid, create new user
@@ -39,7 +39,7 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'User created successfully',
             'data' => $user
-        ], Response::HTTP_OK);
+        ]);
     }
 
     public function authenticate(Request $request)
@@ -54,7 +54,7 @@ class AuthController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['success' => false,'error' => $validator->messages()->first()], 200);
         }
 
         //Request is validated
@@ -63,21 +63,24 @@ class AuthController extends Controller
             if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Login credentials are invalid.',
-                ], 400);
+                    'error' => ['Login credentials are invalid.'],
+                ], 200);
             }
         } catch (JWTException $e) {
             //return $credentials;
             return response()->json([
                 'success' => false,
-                'message' => 'Could not create token.',
-            ], 500);
+                'error' => ['Could not create token.'],
+            ], 200);
         }
+        $user = JWTAuth::user();
+        $user->accessToken= $token;
 
         //Token created, return with success response and jwt token
         return response()->json([
             'success' => true,
             'token' => $token,
+            'user' => $user,
         ]);
     }
 

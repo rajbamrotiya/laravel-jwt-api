@@ -49,7 +49,7 @@ class ProductController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['success' => false,'error' => $validator->messages()], 200);
         }
 
 
@@ -88,7 +88,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Sorry, product not found.'
-            ], 400);
+            ], 200);
         }
 
         return $product;
@@ -115,7 +115,7 @@ class ProductController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['success' => false,'error' => $validator->messages()->first()], 200);
         }
 
         $img = ($request->hasFile('image')) ?
